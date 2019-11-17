@@ -1,21 +1,51 @@
-const axios = require('axios');
-
 const router = require('express').Router();
 
-router.get('/', (req, res) => {
-  const requestOptions = {
-    headers: { accept: 'application/json' },
-  };
+const Comments = require('./comment-model');
+const Middleware = require('../bucketlist/bucketlist-middleware');
+// const Bucketlist = require('../bucketlist/bucketlist-model');
+// const Items = require('../item/items-model');
 
-  axios
-    .get('https://icanhazdadjoke.com/search', requestOptions)
-    .then(response => {
-      res.status(200).json(response.data.results);
+// const Users = require('../user/user-model');
+// const Bucketlist = require('./bucketlist-model');
+// const Items = require('../item/items-model');
+
+router.get('/:id', (req, res) => {
+    const commentId = req.params.id;
+    Comments.findById(commentId).then(comment => {
+      res.status(200).json(comment);
     })
-    .catch(err => {
-      res.status(500).json({ message: 'Error Fetching Jokes', error: err });
+});
+
+
+router.delete('/:id', Middleware.setUserId, (req, res) => {
+  const commentId = req.params.id;
+  const userId = req.params.userId
+    Comments.findById(commentId).then(comment => {
+      if (comment.user_id === userId ) {
+        Comments.remove(commentId).then(count =>
+          res.status(200).json(count))
+      } else {
+        res.status(401).json({"message": "you are not the comment creator"});
+      }
+    }).catch(error => {
+      console.log(error);
+      res.status(500).json({"message": "Error deleting comment"})
+    });
+  
+});
+
+router.post('/', Middleware.setUserId, (req, res) => {
+  const {text, item_id} = req.body;
+  const userId = req.params.userId;
+  const newComment = {text, item_id, user_id: userId};
+  Comments.add(newComment).then(comment =>
+    res.status(200).json(comment)
+    ).catch(error => {
+      console.log(error);
+      res.status(500).json({"message": "Error creating comment"})
     });
 });
+
 
 module.exports = router;
 

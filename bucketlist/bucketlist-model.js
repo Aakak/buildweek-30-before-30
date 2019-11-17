@@ -1,9 +1,9 @@
 const db = require('../database/dbConfig')
 
 module.exports = {
-//   add,
+  create,
 //   find,
-//   findBy,
+  findBy,
   findById,
   update
 };
@@ -12,15 +12,16 @@ module.exports = {
 //   return db('bucketlist').select('id', 'public');
 // }
 
-// function findBy(filter) {
-//   return db('users').where(filter);
-// }
+function findBy(filter) {
+  return db('bucketlists').where(filter);
+}
 
-// async function add(user) {
-//   const [id] = await db('users').insert(user);
+async function create(user_id) {
 
-//   return findById(id);
-// }
+  const [id] = await db('bucketlists').insert({user_id: user_id});
+
+  return findById(id);
+}
 
 function findById(id) {
   return db('bucketlists').where({id}).first();

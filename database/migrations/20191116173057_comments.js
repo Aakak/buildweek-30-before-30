@@ -7,9 +7,14 @@ exports.up = function(knex) {
             .unsigned()
             .references('id')
             .inTable('items')
-            .notNullable()
-            .unique();
-            comments.timestamps(true, true);
+            .notNullable();
+          comments
+            .integer('user_id')
+            .unsigned()
+            .references('id')
+            .inTable('users')
+            .notNullable();
+          comments.timestamps(true, true);            
     });
   };
   

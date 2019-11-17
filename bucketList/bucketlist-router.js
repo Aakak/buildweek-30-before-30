@@ -20,6 +20,19 @@ router.get('/:id', Middleware.setUserId, Middleware.getBucketList, (req, res) =>
     });
 });
 
+// always private 
+router.get('/', Middleware.setUserId, (req, res) => {
+  const userId = req.params.userId;
+  Bucketlist.findBy({user_id: userId}).first()
+  .then(bucketlist => {
+    console.log('get bucket private - got the data')
+      res.status(200).json(bucketlist);
+    }).catch(error => {
+      console.log(error);
+      res.status(500).json({"message": "error fetching bucketlist"});
+    });
+});
+
 // must be authenticated and the list sh
 router.put('/:id', Middleware.setUserId, Middleware.getBucketList, (req, res) => {
   const bucketlist = req.params.bucketlist;

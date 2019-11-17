@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 const Users = require('../user/user-model');
+const Bucketlist = require('../bucketlist/bucketlist-model');
 
 const secrets = require('../config/secrets');
 
@@ -12,8 +13,10 @@ router.post('/register', (req, res) => {
     const hash = bcrypt.hashSync(user.password, 16)
     user.password = hash;
     Users.add(user)
-    .then(saved => {
-      res.status(201).json(saved);
+    .then(newUser => {
+      Bucketlist.create(newUser.id).then(bucket =>
+        res.status(201).json(newUser)
+      ).catch(error => res.status(500).json(error));
     })
     .catch(error => {
       console.log(error)
