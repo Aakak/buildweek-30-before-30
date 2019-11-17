@@ -1,1 +1,1 @@
-# buildweek-30-before-30
+MSG=hello from .env file
